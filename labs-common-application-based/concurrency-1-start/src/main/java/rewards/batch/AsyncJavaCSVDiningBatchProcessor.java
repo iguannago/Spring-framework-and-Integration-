@@ -81,7 +81,7 @@ public class AsyncJavaCSVDiningBatchProcessor extends CSVDiningBatchProcessorBas
         String csvRecord;
         while ((csvRecord = inputReader.readLine()) != null) {
             //TODO-01 Use executorService to submit records and get a result in a list
-            final Dining dining = super.createDiningFromCsv(csvRecord);
+            final Dining dining = createDiningFromCsv(csvRecord);
 
             Callable<RewardConfirmation> rewardConfirmationCallable = new Callable<RewardConfirmation>() {
                 @Override
@@ -95,9 +95,11 @@ public class AsyncJavaCSVDiningBatchProcessor extends CSVDiningBatchProcessorBas
         //TODO-02 Check each result
         for (Future<RewardConfirmation> futureRewardConfirmation : futureRewardConfirmations) {
             try {
-                super.getLogger().info(String.format("rewardConfirmation:", futureRewardConfirmation.get()));
+
+                RewardConfirmation rewardConfirmation = futureRewardConfirmation.get();
+                getLogger().info("rewardConfirmation:" + rewardConfirmation);
             } catch (Throwable throwable) {
-                super.getLogger().error(String.format("rewardConfirmation exception:", throwable));
+                getLogger().error(String.format("rewardConfirmation exception:", throwable));
             }
         }
 
