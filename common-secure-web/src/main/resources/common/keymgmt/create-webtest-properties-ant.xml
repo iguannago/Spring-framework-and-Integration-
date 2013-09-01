@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="Create Keystore Properties" default="create-keystore-properties">
+
+    <exec executable="hostname" outputproperty="server.hostname" />
+    <property name="server.dname">CN=${server.hostname}, OU=common.web, O=common, C=GB</property>
+
+    <target name="check.keystore.properties">
+        <available file="${server.keystore}" property="keystores.created" />
+    </target>
+
+    <target name="create-keystore-properties" depends="check.keystore.properties">
+
+        <echoproperties destfile="${keystore.properties}">
+            <propertyset>
+                <propertyref prefix="server" />
+                <propertyref prefix="client" />
+                <propertyref prefix="client2" />
+                <propertyref prefix="untrusted.client" />
+                <propertyref name="keystores.created" />
+            </propertyset>
+        </echoproperties>
+
+    </target>
+
+</project>

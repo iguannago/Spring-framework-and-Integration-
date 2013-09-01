@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:batch.properties"/>
+
+    <!-- TODO-03 Create bean definition for the ConfirmationReader -->
+    <bean id="confirmationReader" class="ccp.batch.ConfirmationReader">
+        <constructor-arg name="jmsTemplate" ref="receivingJmsTemplate"/>
+    </bean>
+
+    <!-- TODO-04 Create bean definition for the ConfirmationUpdater -->
+    <bean id="confirmationUpdater" class="ccp.batch.ConfirmationUpdater">
+        <constructor-arg name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="unconfirmedDiningsReader"
+          class="org.springframework.batch.item.database.JdbcPagingItemReader"
+          lazy-init="true">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="fetchSize" value="${chunk.size}"/>
+        <property name="pageSize" value="${chunk.size}"/>
+        <!-- TODO-07 Inject queryProvider property using a properly configured SqlPagingQueryProviderFactoryBean inner bean -->
+        <property name="queryProvider">
+            <bean
+                    class="org.springframework.batch.item.database.support.SqlPagingQueryProviderFactoryBean">
+                <property name="dataSource" ref="dataSource"/>
+                <property name="selectClause" value="SELECT *"/>
+                <property name="fromClause" value="FROM T_DINING"/>
+                <property name="whereClause" value="CONFIRMED = 0"/>
+                <property name="sortKey" value="ID"/>
+            </bean>
+        </property>
+        <!-- TODO-08 Inject a DiningMapper for the rowMapper property as an inner bean -->
+        <property name="rowMapper">
+            <bean class="ccp.batch.DiningMapper"/>
+        </property>
+    </bean>
+
+    <!-- TODO 09 Create a requestSender bean definition of type JmsItemWriter -->
+    <bean id="requestSender" class="org.springframework.batch.item.jms.JmsItemWriter">
+        <property name="jmsTemplate" ref="sendingJmsTemplate"/>
+    </bean>
+</beans>

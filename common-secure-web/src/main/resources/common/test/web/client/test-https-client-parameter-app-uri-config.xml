@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="classpath:/common/test/test-project-module-based-config.xml" />
+    <import resource="classpath:/common/web/client/common-secured-https-client-config.xml" />
+
+    <bean id="clientSecuredHttpsApplicationConnectionParameters" parent="clientSecuredHttpsParametersBase">
+        <property name="baseUriContextPath" value="#{projectModuleNameProps['module.name']}" />
+    </bean>
+
+</beans>

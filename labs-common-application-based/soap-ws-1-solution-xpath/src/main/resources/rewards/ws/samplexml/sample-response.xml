@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rewardAccountForDiningResponse
+        xmlns="http://www.springsource.com/reward-network"
+        confirmationNumber="1200"
+        accountNumber="123456789"
+        amount="8.00"/>

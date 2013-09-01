@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oxm="http://www.springframework.org/schema/oxm" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+	                    http://www.springframework.org/schema/oxm
+	                    http://www.springframework.org/schema/oxm/spring-oxm.xsd
+	                    http://www.springframework.org/schema/util
+	                    http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <oxm:jaxb2-marshaller id="marshaller" contextPath="rewards.ws.marshalling"/>
+
+    <bean class="org.springframework.ws.client.core.WebServiceTemplate">
+        <property name="marshaller" ref="marshaller" />
+        <property name="unmarshaller" ref="marshaller" />
+        <property name="defaultUri" value="#{httpProps.uri}" />
+    </bean>
+
+    <util:properties id="projectProps" location="classpath:project-module-name.properties" />
+
+    <beans profile="tomcat">
+        <util:properties id="httpProps">
+            <prop key="uri">http://localhost:8080/#{projectProps['module.name']}/rewards</prop>
+        </util:properties>
+    </beans>
+
+    <beans profile="jetty">
+        <util:properties id="httpProps">
+            <prop key="uri">http://localhost:8180/#{projectProps['module.name']}/rewards</prop>
+        </util:properties>
+    </beans>
+
+</beans>

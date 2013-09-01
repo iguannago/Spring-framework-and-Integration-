@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/integration
+                           http://www.springframework.org/schema/integration/spring-integration.xsd
+                           http://www.springframework.org/schema/aop
+                           http://www.springframework.org/schema/aop/spring-aop.xsd
+                           http://www.springframework.org/schema/integration/jms
+                           http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd">
+
+    <import resource="classpath:/rewards/messaging/spring-integration-idempotent-receiver-config.xml"/>
+    <import resource="classpath:/rewards/messaging/spring-integration-marshalling-config.xml"/>
+
+    <int-jms:inbound-gateway request-destination-name="rewards.queue.xmldining"
+                             request-channel="xmlDinings"
+                             reply-channel="xmlConfirmations"
+                             connection-factory="connectionFactory"
+                             correlation-key="JMSCorrelationID"/>
+
+    <!--<bean id="marshallingMessageConverter"-->
+          <!--class="org.springframework.jms.support.converter.MarshallingMessageConverter">-->
+        <!--<property name="marshaller">-->
+            <!--<bean class="rewards.messaging.RewardConfirmationMarshaller"/>-->
+        <!--</property>-->
+        <!--<property name="unmarshaller">-->
+            <!--<bean class="rewards.messaging.DiningRequestUnmarshaller"/>-->
+        <!--</property>-->
+        <!--<property name=""-->
+    <!--</bean>-->
+
+    <bean id="loggingAdvice" class="common.aspects.LoggingAdvice">
+        <constructor-arg value="rewards"/>
+        <constructor-arg value="INFO"/>
+    </bean>
+
+    <aop:config>
+        <aop:aspect ref="loggingAdvice">
+            <aop:around method="logCall"
+                        pointcut="execution(* org.springframework.integration.transformer.Transformer+.*(..))"/>
+        </aop:aspect>
+    </aop:config>
+
+    <int:channel-interceptor pattern="*">
+        <int:wire-tap channel="loggerChannel"/>
+    </int:channel-interceptor>
+
+    <int:poller default="true" fixed-delay="250"/>
+
+    <int:channel id="loggerChannel">
+        <int:queue capacity="20"/>
+    </int:channel>
+
+    <int:logging-channel-adapter channel="loggerChannel" log-full-message="true" level="DEBUG" logger-name="rewards"/>
+
+</beans>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>soap-ws-1-solution-xpath</artifactId>
+    <packaging>war</packaging>
+    <name>${project.artifactId}</name>
+    <parent>
+        <artifactId>labs-common-application-based</artifactId>
+        <groupId>springworkshop</groupId>
+        <version>0.0.2</version>
+    </parent>
+
+    <properties>
+        <trang.sampleXml.dir>${project.build.sourceDirectory}/../resources/rewards/ws/samplexml</trang.sampleXml.dir>
+        <xjc.schemas.dir>${project.build.sourceDirectory}/../resources/rewards/ws/schemas</xjc.schemas.dir>
+        <xjc.target.dir>${project.build.sourceDirectory}/../java/rewards/ws/marshalling</xjc.target.dir>
+        <xjc.target.package>rewards.ws.marshalling</xjc.target.package>
+    </properties>
+
+    <dependencies>
+        <!-- Web Services -->
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-core</artifactId>
+            <version>${spring.ws.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-test</artifactId>
+            <version>${spring.ws.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.2</version>
+        </dependency>
+    </dependencies>
+    <repositories>
+        <!-- required in order to download Sun related jars such as jaxb.
+          For licensing issue, they are not available on the Maven central repository -->
+        <repository>
+            <id>maven2-repository.dev.java.net</id>
+            <name>Java.net Maven 2 Repository</name>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.6</version>
+                <executions>
+                    <execution>
+                        <id>generate-schema</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <target>
+                                <delete verbose="true">
+                                    <fileset dir="${trang.sampleXml.dir}" includes="*.xsd" />
+                                </delete>
+                                <java classname="com.thaiopensource.relaxng.translate.Driver"
+                                      classpathref="maven.compile.classpath" failonerror="true">
+                                    <arg file="${trang.sampleXml.dir}/sample-request.xml"/>
+                                    <arg file="${trang.sampleXml.dir}/sample-response.xml"/>
+                                    <arg file="${trang.sampleXml.dir}/rewards-generated.xsd"/>
+                                </java>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>clean-generated-java</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <target>
+                                <delete verbose="true">
+                                    <fileset dir="${xjc.target.dir}" includes="*.*" />
+                                </delete>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.sun.tools.xjc.maven2</groupId>
+                <artifactId>maven-jaxb-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-surrogate-classes</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <schemaDirectory>${xjc.schemas.dir}</schemaDirectory>
+                            <generatePackage>${xjc.target.package}</generatePackage>
+                            <generateDirectory>${project.build.sourceDirectory}</generateDirectory>
+                        </configuration>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                           <excludes>
+                                <exclude>**/SoapRewardNetworkTests.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>jetty-test</id>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mortbay.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>start-jetty</id>
+                     </execution>
+                    <execution>
+                        <id>stop-jetty</id>
+                     </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

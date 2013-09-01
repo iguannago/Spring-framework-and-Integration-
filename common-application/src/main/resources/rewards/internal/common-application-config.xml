@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+              http://www.springframework.org/schema/beans/spring-beans.xsd
+              http://www.springframework.org/schema/tx
+              http://www.springframework.org/schema/tx/spring-tx.xsd
+              http://www.springframework.org/schema/context
+              http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Configuration for the rewards application.  Beans here define the heart of the application logic. -->
+
+    <context:annotation-config/>
+
+    <!-- Instructs the container to look for beans with @Transactional and decorate them -->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!-- AccountManager service -->
+    <bean id="accountManager" class="rewards.internal.account.AccountManagerImpl">
+        <constructor-arg ref="accountRepository"/>
+    </bean>
+
+    <!-- Rewards accounts for dining: the application entry-point -->
+    <bean id="rewardNetwork" class="rewards.internal.RewardNetworkImpl">
+        <constructor-arg name="accountRepository" ref="accountRepository"/>
+        <constructor-arg name="restaurantRepository" ref="restaurantRepository"/>
+        <constructor-arg name="rewardRepository" ref="rewardRepository"/>
+    </bean>
+
+    <!-- Loads accounts from the data source -->
+    <bean id="accountRepository" class="rewards.internal.account.HibernateAccountRepository">
+        <constructor-arg ref="sessionFactory"/>
+    </bean>
+
+    <!-- Loads restaurants from the data source -->
+    <bean id="restaurantRepository" class="rewards.internal.restaurant.HibernateRestaurantRepository">
+        <constructor-arg ref="sessionFactory"/>
+    </bean>
+
+    <!-- Records reward confirmation records in the data source -->
+    <bean id="rewardRepository" class="rewards.internal.reward.JdbcRewardRepository">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- A Hibernate SessionFactory for mapping Accounts and Restaurants from object to relation tables -->
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="annotatedClasses">
+            <list>
+                <value>rewards.internal.account.Account</value>
+                <value>rewards.internal.account.Beneficiary</value>
+                <value>rewards.internal.account.CreditCard</value>
+                <value>rewards.internal.restaurant.Restaurant</value>
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.format_sql=true
+                hibernate.show_sql=false
+            </value>
+        </property>
+    </bean>
+
+    <bean class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor"/>
+</beans>

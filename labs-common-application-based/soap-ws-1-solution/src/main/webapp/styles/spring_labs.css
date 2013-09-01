@@ -1,0 +1,165 @@
+@IMPORT url("forms.css");
+
+body,div,td {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	color: #666;
+}
+
+div#header {
+	background: none repeat scroll 0 0;
+	background-color: transparent;
+	color: white;
+	margin: 0 0 1.5em;
+	padding: 5px 0;
+	text-align: left;
+}
+
+div#banner {
+	background-color: #fff;
+	float: centre;
+	margin: 0;
+	padding: 10px 0 10px 0;
+	text-align: left;
+	width: 100%;
+}
+
+div#main {
+	background-color: transparent;
+	color: black;
+}
+
+div#footer {
+	background-color: transparent;
+	color: black;
+	width: 600px;
+	margin: 0 0 20px 0;
+	padding: 0.5em 0 30px 0;
+	clear: both;
+	border-top: 1px dotted #999999;
+	text-align: right;
+}
+
+div#footer ul {
+	display: inline;
+}
+
+div#footer ul li {
+	display: inline;
+	margin: 0 0 0 1.0em;
+	padding: 0 0 0 1.0em;
+	list-style-type: none;
+	list-style-image: none;
+	list-style-position: inside;
+	border-left: 1px solid #ff4040;
+}
+
+div#footer ul li.first {
+	border-width: 0;
+}
+
+h1,h2,h3 {
+	font-family: Helvetica, sans-serif;
+	color: #8B008B;
+}
+
+h1 {
+	font-size: 26px;
+	line-height: 40px;
+}
+
+h2 {
+	font-size: 18px;
+	line-height: 36px;
+}
+
+h3 {
+	font-size: 16px;
+	line-height: 32px;
+}
+
+div#nav a,div#nav a:link,div#nav a:active,div#nav a:visited {
+	background-color: silver;
+}
+
+div#nav strong a,div#nav strong a:link,div#nav strong a:active,div#nav strong a:visited,div#nav strong a:hover
+	{
+	background-color: black;
+}
+
+a, a:link {
+	color: blue;
+	text-decoration: underline;
+	font-size: 13px;
+	background: transparent;
+}
+
+a:visited {
+	color: maroon;
+	background: transparent;
+}
+
+a:hover,a:active {
+	color: navy;
+	font-weight: bold;
+	background: transparent;
+}
+
+a:visited {
+	color: maroon;
+	background: transparent;
+}
+
+ul {
+	list-style: disc url(images/bullet.gif);
+}
+
+li {
+	padding-top: 5px;
+}
+
+li ul {
+	list-style: square url(images/sub-bullet.gif);
+}
+
+li ul li ul {
+	list-style: circle none;
+}
+
+table {
+	background: #FAF0E6;
+	border: 2px solid #e0e7d3;
+	border-collapse: collapse;
+}
+
+table table {
+	margin: -5px 0;
+	border: 0px solid #e0e7d3;
+	width: 100%;
+}
+
+table thead {
+	font-weight: bold;
+	font-style: italic;
+	background-color: #FFE4FF;
+}
+
+table th {
+	font-size: 12px;
+	text-align: left;
+	font-weight: bold;
+	padding: 5px;
+}
+
+table td,table th {
+	padding: 5px;
+}
+
+caption {
+	caption-side: top;
+	width: auto;
+	text-align: left;
+	font-size: 12px;
+	color: #848f73;
+	padding-bottom: 4px;
+}

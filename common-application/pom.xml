@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>common-application</artifactId>
+    <name>${project.artifactId}</name>
+    <parent>
+        <artifactId>labs-parent_3_1</artifactId>
+        <groupId>springworkshop</groupId>
+        <version>0.0.2</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <artifactId>common-code_3_1</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.thaiopensource</groupId>
+            <artifactId>trang</artifactId>
+            <version>${trang.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>${jaxb.plugin.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

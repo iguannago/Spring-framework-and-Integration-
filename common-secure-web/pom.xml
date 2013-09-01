@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>common-secure-web</artifactId>
+    <name>${project.artifactId}</name>
+    <parent>
+        <artifactId>labs-parent_3_1</artifactId>
+        <groupId>springworkshop</groupId>
+        <version>0.0.2</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+            <version>${spring.framework.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-xml</artifactId>
+            <version>${spring.ws.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache.httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>${apache.httpclient.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-servlet</artifactId>
+            <version>${jetty.version}</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>common-code_3_1</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>common-code_3_1</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>common-application</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>${antplugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>clean-keystores</id>
+                        <phase>clean</phase>
+                        <configuration>
+                            <target>
+                                <property name="local.keystore.dir" value="${project.build.testSourceDirectory}/../resources/keystores" />
+                                <delete verbose="true" dir="${local.keystore.dir}"/>
+                                <delete verbose="true" dir="${keystore.dir}"/>
+                                <delete verbose="true" file="${keystore.properties}"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>test-ant-keymgmt</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <target>
+                                <property name="test_classpath" refid="maven.test.classpath"/>
+                                <ant antfile="${project.build.testSourceDirectory}/../resources/common/keymgmt/testbuild-ant.xml"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-test-keystores</id>
+                        <phase>test-compile</phase>
+                        <configuration>
+                            <target>
+                                <property name="local.keystore.dir" value="${project.build.testSourceDirectory}/../resources/keystores" />
+                                <property name="keygen_classpath" refid="maven.test.classpath"/>
+                                <delete verbose="true" dir="${local.keystore.dir}"/>
+                                <ant antfile="${project.build.testSourceDirectory}/../resources/common/web/create-localtest-keystores-ant.xml">
+                                    <target name="create-keystores"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-webtest-keystore-properties</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <target>
+                                <property name="client.alias">client</property>
+                                <property name="client.certificate">${keystore.dir}/client.cert</property>
+                                <property name="client.dname">CN=client, OU=common.web, O=common, C=GB</property>
+                                <property name="client2.keystore">${keystore.dir}/client2-keystore.jks</property>
+                                <property name="client2.keystore.password">client2pwd</property>
+                                <property name="client2.alias">client2</property>
+                                <property name="client2.certificate">${keystore.dir}/client2.cert</property>
+                                <property name="client2.dname">CN=client2, OU=common.web, O=common, C=GB</property>
+                                <property name="untrusted.client.keystore">${keystore.dir}/untrusted-keystore.jks
+                                </property>
+                                <property name="untrusted.client.keystore.password">clientpwd</property>
+                                <property name="untrusted.client.alias">untrusted-client</property>
+                                <property name="untrusted.client.certificate">${keystore.dir}/untrusted-client.cert
+                                </property>
+                                <property name="untrusted.client.dname">CN=untrusted-client, OU=common.web, O=common, C=GB</property>
+                                <property name="server.alias">tomcat</property>
+                                <property name="server.certificate">${keystore.dir}/tomcat.cert</property>
+
+                                <ant antfile="${project.build.sourceDirectory}/../resources/common/keymgmt/create-webtest-properties-ant.xml">
+                                    <target name="create-keystore-properties"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>create-webtest-keystores</id>
+                        <phase>compile</phase>
+                        <configuration>
+                            <target>
+                                <property name="keygen_classpath" refid="maven.test.classpath"/>
+
+                                <ant antfile="${project.build.sourceDirectory}/../resources/common/keymgmt/create-webtest-keystores-ant.xml">
+                                    <target name="create-keystores"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.7.2</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <javax.net.ssl.trustStoreFilename>${default.client.truststore}</javax.net.ssl.trustStoreFilename>
+                        <javax.net.ssl.trustStorePassword>${default.client.truststore.password}
+                        </javax.net.ssl.trustStorePassword>
+                        <javax.net.debug>ssl</javax.net.debug>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

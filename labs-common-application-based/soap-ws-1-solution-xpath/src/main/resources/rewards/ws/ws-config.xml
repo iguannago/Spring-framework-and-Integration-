@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:ws="http://www.springframework.org/schema/web-services"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd
+		                http://www.springframework.org/schema/context
+		                http://www.springframework.org/schema/context/spring-context.xsd
+		                http://www.springframework.org/schema/web-services
+		                http://www.springframework.org/schema/web-services/web-services.xsd">
+
+    <ws:annotation-driven/>
+
+    <ws:interceptors>
+        <bean class="org.springframework.ws.server.endpoint.interceptor.PayloadLoggingInterceptor">
+            <property name="loggerName" value="rewards"/>
+        </bean>
+    </ws:interceptors>
+
+    <bean class="org.springframework.ws.soap.server.endpoint.SoapFaultMappingExceptionResolver">
+        <property name="exceptionMappings">
+            <value>
+                org.springframework.dao.EmptyResultDataAccessException=CLIENT
+            </value>
+        </property>
+        <property name="order" value="1"/>
+    </bean>
+
+    <ws:dynamic-wsdl id="rewardNetworkDefinition" portTypeName="Rewards" locationUri="/rewards">
+        <ws:xsd location="classpath:/rewards/ws/schemas/reward-network.xsd"/>
+    </ws:dynamic-wsdl>
+
+    <context:component-scan base-package="rewards.ws"/>
+
+</beans>

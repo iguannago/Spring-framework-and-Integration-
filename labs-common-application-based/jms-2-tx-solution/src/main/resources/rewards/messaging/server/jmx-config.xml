@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!--  for inspecting the DB and raising errors, we make some MBeans available -->
+	<bean class="org.springframework.jmx.export.MBeanExporter">
+		<property name="beans">
+			<map>
+				<entry key="rewards:type=ConfirmationLister">
+					<bean class="rewards.messaging.server.ConfirmationLister">
+						<constructor-arg ref="jdbcTemplate"/>
+					</bean>
+				</entry>
+				<entry key="rewards:type=DiningListener" value-ref="diningListener"/>
+			</map>
+		</property>
+	</bean>
+
+</beans>

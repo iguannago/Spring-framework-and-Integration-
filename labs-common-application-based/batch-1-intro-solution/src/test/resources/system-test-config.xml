@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<!--
+		Configuration to support system testing the ccp application.
+	-->
+
+	<import resource="classpath:db-config.xml" />
+	<import resource="classpath:batch-execution-config.xml" />
+	<import resource="classpath:batch-job-config.xml" />
+	<import resource="classpath:batch-processors-config.xml" />
+	<import resource="classpath:jms-infra-config.xml" />
+	<import resource="classpath:jms-ccp-config.xml" />
+	
+	<context:annotation-config/>
+
+	<!-- put some test messages on the queue: -->
+	<bean class="ccp.batch.QueuePopulator">
+		<constructor-arg>
+			<bean class="org.springframework.jms.core.JmsTemplate">
+				<property name="connectionFactory" ref="connectionFactory"/>
+				<property name="defaultDestinationName" value="confirmation.queue"/>
+			</bean>
+		</constructor-arg>
+	</bean>
+
+	<!-- helps with testing (autowired, injected in the test instance) -->
+	<bean class="org.springframework.batch.test.JobLauncherTestUtils" lazy-init="true"/>
+
+	<!-- make the dining queue view available for checking in the test: -->
+	<bean id="diningQueueView" class="org.springframework.jmx.access.MBeanProxyFactoryBean">
+		<property name="proxyInterface" value="org.apache.activemq.broker.jmx.QueueViewMBean"/>
+		<property name="objectName" value="org.apache.activemq:BrokerName=embedded,Type=Queue,Destination=dining.queue"/>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+</beans>

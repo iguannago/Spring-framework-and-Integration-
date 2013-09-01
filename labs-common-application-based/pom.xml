@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <artifactId>labs-common-application-based</artifactId>
+    <name>${project.artifactId}</name>
+    <parent>
+        <artifactId>labs-parent_3_1</artifactId>
+        <groupId>springworkshop</groupId>
+        <version>0.0.2</version>
+    </parent>
+
+    <modules>
+        <module>batch-1-intro-start</module>
+        <module>batch-1-intro-solution</module>
+        <module>batch-2-restart-solution</module>
+        <module>batch-2-restart-start</module>
+        <module>batch-3-scaling-start</module>
+        <module>batch-3-scaling-solution</module>
+        <module>concurrency-1-solution</module>
+        <module>concurrency-1-start</module>
+        <module>integration-1-intro-solution</module>
+        <module>integration-1-intro-start</module>
+        <module>integration-2-patterns-solution</module>
+        <module>integration-2-patterns-start</module>
+        <module>integration-3-advanced-solution</module>
+        <module>integration-3-advanced-start</module>
+        <module>integration-4-jms-demo</module>
+        <module>jms-1-solution</module>
+        <module>jms-1-start</module>
+        <module>jms-2-tx-solution</module>
+        <module>jms-2-tx-start</module>
+        <module>rest-ws-1-solution</module>
+        <module>rest-ws-1-start</module>
+        <module>soap-ws-1-solution</module>
+        <module>soap-ws-1-solution-xpath</module>
+    </modules>
+
+    <dependencies>
+        <dependency>
+            <artifactId>common-code_3_1</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+        <dependency>
+            <artifactId>common-application</artifactId>
+            <groupId>springworkshop</groupId>
+            <version>${labs.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

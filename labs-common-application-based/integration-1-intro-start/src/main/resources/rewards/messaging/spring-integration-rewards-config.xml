@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns="http://www.springframework.org/schema/integration"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:int-mail="http://www.springframework.org/schema/integration/mail"
+             xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+             xsi:schemaLocation="http://www.springframework.org/schema/integration/mail
+                        http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd
+                        http://www.springframework.org/schema/integration
+                        http://www.springframework.org/schema/integration/spring-integration.xsd
+                        http://www.springframework.org/schema/integration/jms
+                        http://www.springframework.org/schema/integration/jms/spring-integration-jms.xsd
+                        http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <beans:import resource="classpath:/rewards/internal/common-application-config.xml"/>
+
+    <!-- TODO-01 Add an <int-jms:inbound-gateway> element for appropriate queues-->
+
+    <int-jms:inbound-gateway request-destination-name="rewards.queue.dining"
+                             default-reply-queue-name="rewards.queue.confirmation"
+                             request-channel="dinings"
+                             reply-channel="confirmations"/>
+
+    <!-- TODO 02 Define a direct channel called 'dinings' for the inbound gateway -->
+    <!-- TODO 04 Add a wire-tap to the 'loggingChannel' as an interceptor to the 'dinings' channel -->
+
+    <channel id="dinings">
+        <interceptors>
+            <wire-tap channel="loggingChannel"/>
+        </interceptors>
+    </channel>
+
+    <!-- TODO 05 Add a logging-channel-adapter that logs headers and payload from 'loggingChannel' -->
+    <logging-channel-adapter id="loggingChannel" log-full-message="true" level="WARN"/>
+
+    <!-- TODO 03 Define a service-activator that calls the rewardNetwork for messages on the 'dinings' channel -->
+    <service-activator input-channel="dinings" method="rewardAccountFor"
+                       output-channel="confirmations"
+                       ref="rewardNetwork"/>
+
+    <!-- TODO 06 Define a publish-subscribe channel called 'confirmations' as reply channel and update the existing components to use it -->
+    <publish-subscribe-channel id="confirmations"/>
+
+    <!-- TODO 07 Define a 'rewardMailMessageCreator' bean with a corresponding service-activator and output channel 'mails' -->
+    <service-activator input-channel="confirmations" output-channel="mails"
+                       ref="rewardMailCreator"/>
+
+    <beans:bean id="rewardMailCreator" class="rewards.messaging.RewardMailMessageCreator">
+        <beans:constructor-arg ref="accountRepository"/>
+    </beans:bean>
+
+    <!-- TODO 08 Define a <int-mail:outbound-channel-adapter> that sends from 'mails' to localhost:2525 -->
+    <int-mail:outbound-channel-adapter id="mails" host="localhost" port="2525"/>
+
+</beans:beans>

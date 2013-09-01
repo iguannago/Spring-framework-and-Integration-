@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<project name="Test Build" default="create-new-keys">
+
+    <property name="keystore.directory" value="${project.build.testSourceDirectory}/../resources/keystores" />
+    <exec executable="hostname" outputproperty="host.name"/>
+
+    <property name="test-client0.keystore" value="${keystore.directory}/test-client0.jks" />
+    <property name="test-client0.password" value="client0pwd" />
+    <property name="test-client0.alias" value="client0" />
+    <property name="test-client0.certificate" value="${keystore.directory}/client0.cert" />
+    <property name="test-client0.dname" value="CN=Client Zero, OU=rewardsonline, O=rewardsonline, C=GB" />
+
+    <property name="test-client1.keystore" value="${keystore.directory}/test-client1.jks" />
+    <property name="test-client1.password" value="client1pwd" />
+    <property name="test-client1.alias" value="client1" />
+    <property name="test-client1.certificate" value="${keystore.directory}/client1.cert" />
+    <property name="test-client1.dname" value="CN=Client One, OU=rewardsonline, O=rewardsonline, C=GB" />
+
+    <property name="test-server.keystore" value="${keystore.directory}/test-server.jks" />
+    <property name="test-server.password" value="serverpwd" />
+    <property name="test-server.alias" value="server" />
+    <property name="test-server.certificate" value="${keystore.directory}/server.cert" />
+    <property name="test-server.dname" value="CN=${host.name}, OU=rewardsonline, O=rewardsonline, C=GB" />
+
+    <include as="keymgmt">
+        <javaresource name="/common/keymgmt/keymgmt-ant.xml" classpath="${test_classpath}" />
+    </include>
+
+    <target name="create-new-keys" >
+        <antcall target="keymgmt.generate-key-and-certificate">
+            <param name="gen.keystore" value="${test-client0.keystore}" />
+            <param name="gen.password" value="${test-client0.password}" />
+            <param name="gen.alias" value="${test-client0.alias}" />
+            <param name="gen.dname" value="${test-client0.dname}" />
+        </antcall>
+
+        <antcall target="keymgmt.export-certificate">
+            <param name="export.keystore" value="${test-client0.keystore}" />
+            <param name="export.password" value="${test-client0.password}" />
+            <param name="export.alias" value="${test-client0.alias}" />
+            <param name="export.certificate" value="${test-client0.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.generate-key-and-certificate">
+            <param name="gen.keystore" value="${test-client1.keystore}" />
+            <param name="gen.password" value="${test-client1.password}" />
+            <param name="gen.alias" value="${test-client1.alias}" />
+            <param name="gen.dname" value="${test-client1.dname}" />
+        </antcall>
+
+        <antcall target="keymgmt.export-certificate">
+            <param name="export.keystore" value="${test-client1.keystore}" />
+            <param name="export.password" value="${test-client1.password}" />
+            <param name="export.alias" value="${test-client1.alias}" />
+            <param name="export.certificate" value="${test-client1.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.generate-key-and-certificate">
+            <param name="gen.keystore" value="${test-server.keystore}" />
+            <param name="gen.password" value="${test-server.password}" />
+            <param name="gen.alias" value="${test-server.alias}" />
+            <param name="gen.dname" value="${test-server.dname}" />
+        </antcall>
+
+        <antcall target="keymgmt.export-certificate">
+            <param name="export.keystore" value="${test-server.keystore}" />
+            <param name="export.password" value="${test-server.password}" />
+            <param name="export.alias" value="${test-server.alias}" />
+            <param name="export.certificate" value="${test-server.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.import-certificate">
+            <param name="import.keystore" value="${test-server.keystore}" />
+            <param name="import.password" value="${test-server.password}" />
+            <param name="import.alias" value="${test-client0.alias}" />
+            <param name="import.certificate" value="${test-client0.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.import-certificate">
+            <param name="import.keystore" value="${test-server.keystore}" />
+            <param name="import.password" value="${test-server.password}" />
+            <param name="import.alias" value="${test-client1.alias}" />
+            <param name="import.certificate" value="${test-client1.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.import-certificate">
+            <param name="import.keystore" value="${test-client0.keystore}" />
+            <param name="import.password" value="${test-client0.password}" />
+            <param name="import.alias" value="${test-server.alias}" />
+            <param name="import.certificate" value="${test-server.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.import-certificate">
+            <param name="import.keystore" value="${test-client1.keystore}" />
+            <param name="import.password" value="${test-client1.password}" />
+            <param name="import.alias" value="${test-server.alias}" />
+            <param name="import.certificate" value="${test-server.certificate}" />
+        </antcall>
+
+        <antcall target="keymgmt.list-certificates">
+            <param name="list.keystore" value="${test-server.keystore}" />
+            <param name="list.password" value="${test-server.password}" />
+        </antcall>
+
+        <antcall target="keymgmt.list-certificates">
+            <param name="list.keystore" value="${test-client0.keystore}" />
+            <param name="list.password" value="${test-client0.password}" />
+        </antcall>
+
+        <antcall target="keymgmt.list-certificates">
+            <param name="list.keystore" value="${test-client1.keystore}" />
+            <param name="list.password" value="${test-client1.password}" />
+        </antcall>
+
+    </target>
+
+</project>

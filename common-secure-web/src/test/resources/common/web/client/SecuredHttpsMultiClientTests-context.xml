@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.0.xsd">
+
+    <import resource="classpath:/common/test/web/client/test-https-multiclient-parameter-app-uri-config.xml" />
+
+    <bean id="embeddedJettyServer" class="common.web.server.DefaultEmbeddedJettyServer" init-method="startWait" destroy-method="stopWait">
+        <constructor-arg name="httpPort" value="0" />
+        <constructor-arg name="httpsPort" value="#{clientSecuredHttpsApplicationConnectionParameters.serverPort}" />
+        <constructor-arg name="keyStore" value="#{keystoreProps['server.keystore']}" />
+        <constructor-arg name="keyStorePassword" value="#{keystoreProps['server.keystore.password']}" />
+        <constructor-arg name="trustStore" value="#{keystoreProps['server.truststore']}"/>
+        <constructor-arg name="trustStorePassword" value="#{keystoreProps['server.truststore.password']}" />
+        <property name="applicationContextPath" value="#{'/' + projectModuleNameProps['module.name']}" />
+        <property name="servlets" ref="servletMap" />
+    </bean>
+
+   <util:map id="servletMap">
+        <entry key="/echo">
+            <bean class="common.web.server.EchoServlet" />
+        </entry>
+    </util:map>
+
+    <bean id="httpClient" class="common.web.client.X509HttpClientFactoryBean">
+        <constructor-arg name="clientKeyStoreParameters" ref="clientKeystoreParameters" />
+    </bean>
+
+    <bean id="httpClient2" class="common.web.client.X509HttpClientFactoryBean">
+        <constructor-arg name="clientKeyStoreParameters" ref="client2KeystoreParameters" />
+    </bean>
+
+    <bean id="httpUntrustedClient" class="common.web.client.X509HttpClientFactoryBean">
+        <constructor-arg name="clientKeyStoreParameters" ref="untrustedClientKeystoreParameters" />
+    </bean>
+
+</beans>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+    <import resource="classpath:/common/web/client/common-http-client-config.xml"/>
+
+    <bean id="clientHttpsParametersBase" abstract="true" parent="clientHttpParametersBase">
+        <property name="secureConnection" value="true" />
+    </bean>
+
+    <bean id="clientKeystoreParameters" parent="clientKeystoreParametersBase">
+        <property name="keyStoreFilename" value="#{keystoreProps['client.keystore']}" />
+        <property name="keyStorePassword" value="#{keystoreProps['client.keystore.password']}" />
+        <property name="trustStoreFilename" value="#{keystoreProps['client.truststore']}" />
+        <property name="trustStorePassword" value="#{keystoreProps['client.truststore.password']}" />
+    </bean>
+
+    <beans profile="tomcat">
+        <bean id="clientSecuredHttpsParametersBase" parent="clientHttpsParametersBase" abstract="true">
+            <property name="serverPort" value="8443"/>
+        </bean>
+    </beans>
+
+    <beans profile="jetty">
+        <bean id="clientSecuredHttpsParametersBase" parent="clientHttpsParametersBase" abstract="true">
+            <property name="serverPort" value="9443"/>
+        </bean>
+    </beans>
+</beans>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:task="http://www.springframework.org/schema/task"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/task
+                            http://www.springframework.org/schema/task/spring-task.xsd
+                            http://www.springframework.org/schema/util
+                            http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <import resource="AsyncSpringCSVDiningBatchProcessorPerformanceTests-context.xml"/>
+
+    <!-- TODO-12 Configure scheduler with single thread in pool -->
+    <task:scheduler id="singleScheduler" pool-size="1"/>
+
+    <!-- TODO-13 Configure tasks to run configuredDiningBatchProcessor on fixed delay defined in properties -->
+    <task:scheduled-tasks scheduler="singleScheduler">
+        <task:scheduled ref="configuredDiningBatchProcessor" method="processConfiguredBatch"
+                        fixed-delay="#{testProps.fixedDelayTimeMs}"/>
+    </task:scheduled-tasks>
+
+    <bean id="configuredDiningBatchProcessor" class="rewards.batch.DelegatingConfiguredDiningBatchProcessor">
+        <constructor-arg name="diningBatchProcessor" ref="aysncSpringCSVDiningBatchProcessor"/>
+        <constructor-arg name="batchInput" value="classpath:/dining-input-large.csv"/>
+    </bean>
+
+    <util:properties id="testProps">
+        <prop key="fixedDelayTimeMs">6000</prop>
+        <prop key="expectedBatchSize">1000</prop>
+        <prop key="maxElapsedTimeMs">5000</prop>
+        <prop key="sleepIntervalMs">1000</prop>
+    </util:properties>
+</beans>

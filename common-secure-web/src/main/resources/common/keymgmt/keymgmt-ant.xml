@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<project name="keymgmt">
+
+    <target name="generate-key-and-certificate" description="Create key and certificate">
+
+        <echo message="Creating key and certificate for alias=${gen.alias}" />
+        <echo message="  gen.keystore=${gen.keystore}" />
+        <echo message="  gen.password=${gen.password}" />
+        <echo message="  gen.dname=${gen.dname}" />
+
+        <dirname property="gen.dir" file="${gen.keystore}"/>
+        <delete file="${gen.keystore}"/>
+        <mkdir dir="${gen.dir}"/>
+        <genkey alias="${gen.alias}" storepass="${gen.password}" keystore="${gen.keystore}" keyalg="RSA"
+                dname="${gen.dname}" verbose="true"/>
+    </target>
+
+    <target name="export-certificate" description="Export certificate">
+
+        <echo message="Exporting certificate for export.alias=${export.alias}" />
+        <echo message="  export.keystore=${export.keystore}" />
+        <echo message="  export.password=${export.password}" />
+        <echo message="  export.certificate=${export.certificate}" />
+
+        <exec executable="keytool" dir="${java.home}/bin">
+            <arg value="-export"/>
+            <arg value="-keystore"/>
+            <arg file="${export.keystore}"/>
+            <arg line="-storepass ${export.password}"/>
+            <arg line="-alias ${export.alias}"/>
+            <arg value="-file"/>
+            <arg file="${export.certificate}"/>
+        </exec>
+    </target>
+
+    <target name="import-certificate" description="Import certificate into keystore">
+
+        <echo message="Importing certificate for alias=${import.alias} into keystore=${import.keystore}" />
+        <echo message="  import.certificate=${import.certificate}" />
+        <echo message="  import.password=${import.password}" />
+
+        <exec executable="keytool" dir="${java.home}/bin">
+            <arg value="-import"/>
+            <arg value="-keystore"/>
+            <arg file="${import.keystore}"/>
+            <arg line="-storepass ${import.password}"/>
+            <arg line="-alias ${import.alias}"/>
+            <arg line="-noprompt"/>
+            <arg value="-file"/>
+            <arg file="${import.certificate}"/>
+        </exec>
+    </target>
+
+    <target name="list-certificates">
+
+        <echo message="List keys and certificate for key/truststore=${list.keystore}" />
+        <echo message="  import.password=${list.password}" />
+
+        <exec executable="keytool" dir="${java.home}/bin">
+            <arg value="-list"/>
+            <arg value="-v"/>
+            <arg value="-keystore"/>
+            <arg file="${list.keystore}"/>
+            <arg line="-storepass ${list.password}"/>
+        </exec>
+    </target>
+
+</project>

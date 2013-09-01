@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ /*
+  ~  * Copyright 2002-2011 the original author or authors, or Red-Black IT Ltd, as appropriate.
+  ~  *
+  ~  * Licensed under the Apache License, Version 2.0 (the "License");
+  ~  * you may not use this file except in compliance with the License.
+  ~  * You may obtain a copy of the License at
+  ~  *
+  ~  *      http://www.apache.org/licenses/LICENSE-2.0
+  ~  *
+  ~  * Unless required by applicable law or agreed to in writing, software
+  ~  * distributed under the License is distributed on an "AS IS" BASIS,
+  ~  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  * See the License for the specific language governing permissions and
+  ~  * limitations under the License.
+  ~  */
+  -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="${batch.jdbc.driver}" />
+		<property name="url" value="${batch.jdbc.url}" />
+		<property name="username" value="${batch.jdbc.user}" />
+		<property name="password" value="${batch.jdbc.password}" />
+		<property name="testWhileIdle" value="${batch.jdbc.testWhileIdle}"/>
+		<property name="validationQuery" value="${batch.jdbc.validationQuery}"/>
+		<property name="maxActive" value="100"/>
+	</bean>
+
+	<!-- Override the default database initializer in batch admin -->
+	<bean name="org.springframework.jdbc.datasource.init.DataSourceInitializer#0, org.springframework.jdbc.datasource.init.DataSourceInitializer#1" class="java.lang.String"/>
+
+	<!--  Initialize the database if enabled: -->
+	<jdbc:initialize-database data-source="dataSource" enabled="${batch.data.source.init}" ignore-failures="DROPS">
+		<jdbc:script location="classpath:org/springframework/batch/core/schema-drop-hsqldb.sql"/>
+		<jdbc:script location="classpath:org/springframework/batch/core/schema-hsqldb.sql"/>
+		<jdbc:script location="classpath:/rewards/testdb/schema.sql"/>
+		<!-- TODO-04 Add the schema for the partition job temporary tables -->
+		<jdbc:script location="classpath:/rewards/testdb/test-data.sql"/>
+	</jdbc:initialize-database>
+
+</beans>
