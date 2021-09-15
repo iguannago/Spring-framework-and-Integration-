@@ -80,7 +80,8 @@ public class AysncSpringCSVDiningBatchProcessor extends CSVDiningBatchProcessorB
         // TODO-08 Check each result
         for (Future<RewardConfirmation> futureRewardConfirmation : futureRewardConfirmations) {
              try {
-                 getLogger().info("RewardConfirmation: " + futureRewardConfirmation.get());
+                 RewardConfirmation rewardConfirmation = futureRewardConfirmation.get();
+                 getLogger().info("RewardConfirmation: " + rewardConfirmation);
 
              } catch (Throwable throwable) {
                  getLogger().error("RewardConfirmation: " + throwable);
